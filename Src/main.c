@@ -99,7 +99,8 @@ int main(void)
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 
-  //HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);
+  HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);
+  //HAL_Delay(10);
   HAL_TIM_Base_Start(&htim1);
 
   // Start ADC conversion
@@ -150,7 +151,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_MSI;
   RCC_OscInitStruct.PLL.PLLM = 1;
-  RCC_OscInitStruct.PLL.PLLN = 40;
+  RCC_OscInitStruct.PLL.PLLN = 16;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV7;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
@@ -168,7 +169,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
   {
     Error_Handler();
   }
@@ -184,10 +185,10 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
 
   // Next round
-  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)dma_buffer, SAMPLES);
+  //HAL_ADC_Start_DMA(&hadc1, (uint32_t*)dma_buffer, SAMPLES);
 
   // Interrupt occurs when transfer and conversion is complete
-  HAL_SPI_Transmit_IT(&hspi1, (uint8_t*)&dma_buffer[SAMPLES / 2], 500 * 2);
+  HAL_SPI_Transmit_IT(&hspi1, (uint8_t*)&dma_buffer[SAMPLES / 2], (SAMPLES/2) * 2);
 
 }
 
@@ -195,7 +196,7 @@ void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* hadc)
 {
   // Interrupt occurs on half of the buffer has been filled
 
-  HAL_SPI_Transmit_IT(&hspi1, (uint8_t*)&dma_buffer[0], 500 * 2);
+  HAL_SPI_Transmit_IT(&hspi1, (uint8_t*)&dma_buffer[0], (SAMPLES/2) * 2);
 }
 
 
